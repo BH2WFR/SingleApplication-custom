@@ -10,9 +10,12 @@ add_library(${PROJECT_NAME} STATIC
 )
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
+#FIXED: Qt 默认版本为 6, SingleApplication 继承自 QApplication
 if(NOT QT_DEFAULT_MAJOR_VERSION)
-    set(QT_DEFAULT_MAJOR_VERSION 5 CACHE STRING "Qt version to use (5 or 6), defaults to 5")
+    set(QT_DEFAULT_MAJOR_VERSION 6 CACHE STRING "Qt version to use (5 or 6), defaults to 6")
 endif()
+set(QAPPLICATION_CLASS "QApplication")
+#* ↑↑↑↑↑↑↑
 
 # Find dependencies
 set(QT_COMPONENTS Core Network)
@@ -53,31 +56,3 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     QT_NO_KEYWORDS
     QT_NO_FOREACH
 )
-
-if(DOXYGEN_FOUND)
-    # Doxygen theme
-    include(FetchContent)
-    FetchContent_Declare(DoxygenAwesome
-        GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css
-        GIT_TAG 4cd62308d825fe0396d2f66ffbab45d0e247724c # 2.0.3
-    )
-    FetchContent_MakeAvailable(DoxygenAwesome)
-    FetchContent_GetProperties(DoxygenAwesome SOURCE_DIR DoxygenAwesome_SOURCE_DIR)
-
-    set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
-    set(DOXYGEN_GENERATE_TREEVIEW YES)
-    set(DOXYGEN_HTML_HEADER ${DoxygenAwesome_SOURCE_DIR}/doxygen-custom/header.html)
-    set(DOXYGEN_HTML_EXTRA_STYLESHEET ${DoxygenAwesome_SOURCE_DIR}/doxygen-awesome.css)
-    set(DOXYGEN_HTML_EXTRA_FILES
-        ${DoxygenAwesome_SOURCE_DIR}/doxygen-awesome-fragment-copy-button.js
-        ${DoxygenAwesome_SOURCE_DIR}/doxygen-awesome-paragraph-link.js
-        ${DoxygenAwesome_SOURCE_DIR}/doxygen-awesome-darkmode-toggle.js
-    )
-
-    doxygen_add_docs(${PROJECT_NAME}Documentation
-        singleapplication.h
-        CHANGELOG.md
-        Windows.md
-        README.md
-    )
-endif()
